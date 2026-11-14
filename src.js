@@ -6,6 +6,13 @@ const form = document.querySelector('#config');
 const status = document.querySelector('#status');
 const log = document.querySelector('#log');
 let stream;
+const stop = document.querySelector('#stop');
+stop.addEventListener('click', () => {
+  if (stream) stream.getTracks().forEach(track => track.stop());
+  stream = null;
+  document.body.classList.remove('active');
+  report('Tocá Iniciar prueba para comenzar.');
+});
 function report(message, error) {
   status.textContent = message;
   let detail = error ? `${error.name || 'Error'}: ${error.message || String(error)}${error.stack ? `\n${error.stack}` : ''}` : '';
@@ -18,6 +25,7 @@ form.addEventListener('submit', async event => {
     return;
   }
   form.querySelector('button').disabled = true;
+  document.body.classList.add('active');
   if (stream) stream.getTracks().forEach(track => track.stop());
   try {
     report('Iniciando Camera Kit…');
@@ -32,7 +40,12 @@ form.addEventListener('submit', async event => {
     await session.applyLens(lens);
     await session.play();
     report('Lens iniciado. Apuntá a la imagen de la revista.');
-  } catch (error) { report('No se pudo iniciar la prueba.', error); }
+  } catch (error) {
+    if (stream) stream.getTracks().forEach(track => track.stop());
+    stream = null;
+    document.body.classList.remove('active');
+    report('No se pudo iniciar la prueba. Abrí los detalles técnicos.', error);
+  }
   finally { form.querySelector('button').disabled = false; }
 });
 document.querySelector('#copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(log.textContent); status.textContent = 'Diagnóstico copiado.'; } catch { status.textContent = 'No se pudo copiar; seleccioná el texto del diagnóstico.'; } });
