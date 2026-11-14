@@ -1,0 +1,2 @@
+{"name":"rua-webar-test","private":true,"version":"1.0.0","type":"module","scripts":{"dev":"vite --host","build":"vite build"},"dependencies":{"@snap/camera-kit":"^1.22.0"},"devDependencies":{"vite":"^7.0.0"}}
+
